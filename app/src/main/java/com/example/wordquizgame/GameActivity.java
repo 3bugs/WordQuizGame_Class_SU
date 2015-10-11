@@ -1,5 +1,6 @@
 package com.example.wordquizgame;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
@@ -7,8 +8,12 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -181,6 +186,72 @@ public class GameActivity extends AppCompatActivity {
         Log.i(TAG, "***** คำศัพท์ตัวเลือกที่สุ่มได้ *****");
         for (String w : mChoiceWordList) {
             Log.i(TAG, w);
+        }
+
+        createChoiceButtons();
+    }
+
+    private void createChoiceButtons() {
+        for (int row = 0; row < mButtonTableLayout.getChildCount(); row++) {
+            TableRow tr = (TableRow) mButtonTableLayout.getChildAt(row);
+            tr.removeAllViews();
+        }
+
+        LayoutInflater inflater = (LayoutInflater) getSystemService(
+                Context.LAYOUT_INFLATER_SERVICE);
+
+        for (int row = 0; row < mNumChoices / 2; row++) {
+            TableRow tr = (TableRow) mButtonTableLayout.getChildAt(row);
+
+            for (int column = 0; column < 2; column++) {
+                Button guessButton = (Button) inflater.inflate(R.layout.guess_button, tr, false);
+                guessButton.setText(mChoiceWordList.remove(0));
+                guessButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        submitGuess((Button) v);
+                    }
+                });
+
+                tr.addView(guessButton);
+            }
+        }
+    }
+
+    private void submitGuess(Button guessButton) {
+        String guessWord = guessButton.getText().toString();
+        String answerWord = getWord(mAnswerFileName);
+
+        mTotalGuesses++;
+
+        // ตอบถูก
+        if (guessWord.equals(answerWord)) {
+            mScore++;
+
+            String msg = guessWord + " ถูกต้องนะคร้าบบบ";
+            mAnswerTextView.setText(msg);
+            mAnswerTextView.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+
+            disableAllButtons();
+        }
+        // ตอบผิด
+        else {
+            String msg = "ผิดครับ ลองใหม่นะครับ";
+            mAnswerTextView.setText(msg);
+            mAnswerTextView.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+
+            guessButton.setEnabled(false);
+        }
+
+    }
+
+    private void disableAllButtons() {
+        for (int row = 0; row < mButtonTableLayout.getChildCount(); row++) {
+            TableRow tr = (TableRow) mButtonTableLayout.getChildAt(row);
+
+            for (int column = 0; column < tr.getChildCount(); column++) {
+                tr.getChildAt(column).setEnabled(false);
+            }
         }
     }
 
