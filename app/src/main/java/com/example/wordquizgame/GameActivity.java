@@ -104,5 +104,36 @@ public class GameActivity extends AppCompatActivity {
         for (String f : mFileNameList) {
             Log.i(TAG, f);
         }
+
+        startQuiz();
+    }
+
+    private void startQuiz() {
+        mTotalGuesses = 0;
+        mScore = 0;
+        mQuizWordList.clear();
+
+        while (mQuizWordList.size() < 3) {
+            int randomIndex = mRandom.nextInt(mFileNameList.size());
+            String fileName = mFileNameList.get(randomIndex);
+
+            if (mQuizWordList.contains(fileName) == false) {
+                mQuizWordList.add(fileName);
+            }
+        }
+
+        Log.i(TAG, "***** ชื่อไฟล์ที่สุ่มได้สำหรับตั้งโจทย์ *****");
+        for (String f : mQuizWordList) {
+            Log.i(TAG, f);
+        }
     }
 }
+
+
+
+
+
+
+
+
+
