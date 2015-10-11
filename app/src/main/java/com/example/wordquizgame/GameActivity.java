@@ -162,7 +162,31 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void prepareChoiceWords() {
+        mChoiceWordList.clear();
 
+        while (mChoiceWordList.size() < mNumChoices) {
+            int randomIndex = mRandom.nextInt(mFileNameList.size());
+            String randomWord = getWord(mFileNameList.get(randomIndex));
+            String answerWord = getWord(mAnswerFileName);
+
+            if (mChoiceWordList.contains(randomWord) == false &&
+                    randomWord.equals(answerWord) == false) {
+                mChoiceWordList.add(randomWord);
+            }
+        }
+
+        int randomIndex = mRandom.nextInt(mChoiceWordList.size());
+        mChoiceWordList.set(randomIndex, getWord(mAnswerFileName));
+
+        Log.i(TAG, "***** คำศัพท์ตัวเลือกที่สุ่มได้ *****");
+        for (String w : mChoiceWordList) {
+            Log.i(TAG, w);
+        }
+    }
+
+    private String getWord(String fileName) {
+        String word = fileName.substring(fileName.indexOf('-') + 1);
+        return word;
     }
 }
 
