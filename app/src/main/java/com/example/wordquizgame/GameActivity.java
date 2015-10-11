@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
@@ -25,15 +27,15 @@ public class GameActivity extends AppCompatActivity {
 
     private int mScore;
     private int mTotalGuesses;
-    private String answerFileName;
+    private String mAnswerFileName;
 
-    private Random random;
-    private Handler handler;
+    private Random mRandom;
+    private Handler mHandler;
 
-    private TextView questionNumberTextView;
-    private ImageView questionImageView;
-    private TableLayout buttonTableLayout;
-    private TextView answerTextView;
+    private TextView mQuestionNumberTextView;
+    private ImageView mQuestionImageView;
+    private TableLayout mButtonTableLayout;
+    private TextView mAnswerTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,5 +60,14 @@ public class GameActivity extends AppCompatActivity {
         }
 
         Log.i(TAG, "Number of choices: " + mNumChoices);
+
+        setupViews();
+    }
+
+    private void setupViews() {
+        mQuestionNumberTextView = (TextView) findViewById(R.id.questionNumberTextView);
+        mQuestionImageView = (ImageView) findViewById(R.id.questionImageView);
+        mButtonTableLayout = (TableLayout) findViewById(R.id.buttonTableLayout);
+        mAnswerTextView = (TextView) findViewById(R.id.answerTextView);
     }
 }
