@@ -2,6 +2,7 @@ package com.example.wordquizgame;
 
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
@@ -126,6 +128,41 @@ public class GameActivity extends AppCompatActivity {
         for (String f : mQuizWordList) {
             Log.i(TAG, f);
         }
+
+        loadNextQuestion();
+    }
+
+    private void loadNextQuestion() {
+        mAnswerTextView.setText(null);
+        mAnswerFileName = mQuizWordList.remove(0);
+
+        String msg = String.format("คำถามข้อ %d จาก %d ข้อ", mScore + 1, 3);
+        mQuestionNumberTextView.setText(msg);
+
+        loadQuestionImage();
+        prepareChoiceWords();
+    }
+
+    private void loadQuestionImage() {
+        String category = mAnswerFileName.substring(0, mAnswerFileName.indexOf('-'));
+        String filePath = category + "/" + mAnswerFileName + ".png";
+
+        AssetManager assets = getAssets();
+        InputStream stream;
+
+        try {
+            stream = assets.open(filePath);
+            Drawable image = Drawable.createFromStream(stream, filePath);
+            mQuestionImageView.setImageDrawable(image);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Error opening file: " + filePath);
+        }
+    }
+
+    private void prepareChoiceWords() {
+
     }
 }
 
