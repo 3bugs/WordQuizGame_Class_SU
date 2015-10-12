@@ -1,9 +1,12 @@
 package com.example.wordquizgame;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -226,6 +229,9 @@ public class GameActivity extends AppCompatActivity {
 
         // ตอบถูก
         if (guessWord.equals(answerWord)) {
+            MediaPlayer mp = MediaPlayer.create(this, R.raw.applause);
+            mp.start();
+
             mScore++;
 
             String msg = guessWord + " ถูกต้องนะคร้าบบบ";
@@ -233,9 +239,52 @@ public class GameActivity extends AppCompatActivity {
             mAnswerTextView.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
 
             disableAllButtons();
+
+            // ตอบถูกและจบเกม (เล่นครบ 3 ข้อแล้ว)
+            if (mScore == 3) {
+                String msgResult = String.format(
+                        "จำนวนครั้งที่ทาย: %d\nเปอร์เซ็นต์ความถูกต้อง: %.1f",
+                        mTotalGuesses,
+                        (100 * 3) / (double) mTotalGuesses
+                );
+
+                new AlertDialog.Builder(this)
+                        .setTitle("สรุปผล")
+                        .setMessage(msgResult)
+                        .setCancelable(false)
+                        .setPositiveButton("เริ่มเกมใหม่", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startQuiz();
+                            }
+                        })
+                        .setNegativeButton("กลับหน้าหลัก", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                finish();
+                            }
+                        })
+                        .show();
+            }
+            // ตอบถูก แต่ยังไม่จบเกม (ยังไม่ครบ 3 ข้อ)
+            else {
+                mHandler.postDelayed(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                loadNextQuestion();
+                            }
+                        },
+                        2000
+                );
+            }
+
         }
         // ตอบผิด
         else {
+            MediaPlayer mp = MediaPlayer.create(this, R.raw.fail3);
+            mp.start();
+
             String msg = "ผิดครับ ลองใหม่นะครับ";
             mAnswerTextView.setText(msg);
             mAnswerTextView.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
