@@ -1,15 +1,17 @@
 package com.example.wordquizgame;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,11 +21,10 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import com.example.wordquizgame.db.MyHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -49,17 +50,21 @@ public class GameActivity extends AppCompatActivity {
     private TableLayout mButtonTableLayout;
     private TextView mAnswerTextView;
 
+    private MyHelper mHelper;
+    private SQLiteDatabase mDatabase;
+    private int mDifficulty;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
         Intent i = getIntent();
-        int diff = i.getIntExtra(MainActivity.KEY_DIFFICULTY, 0);
+        mDifficulty = i.getIntExtra(MainActivity.KEY_DIFFICULTY, 0);
 
-        Log.i(TAG, "Difficulty: " + diff);
+        Log.i(TAG, "Difficulty: " + mDifficulty);
 
-        switch (diff) {
+        switch (mDifficulty) {
             case 0:
                 mNumChoices = 2;
                 break;
@@ -79,6 +84,9 @@ public class GameActivity extends AppCompatActivity {
 
         mRandom = new Random();
         mHandler = new Handler();
+
+        mHelper = new MyHelper(this);
+        mDatabase = mHelper.getWritableDatabase();
 
         setupViews();
         getImageFileNames();
@@ -242,6 +250,8 @@ public class GameActivity extends AppCompatActivity {
 
             // ตอบถูกและจบเกม (เล่นครบ 3 ข้อแล้ว)
             if (mScore == 3) {
+                saveScore();
+
                 String msgResult = String.format(
                         "จำนวนครั้งที่ทาย: %d\nเปอร์เซ็นต์ความถูกต้อง: %.1f",
                         mTotalGuesses,
@@ -291,7 +301,14 @@ public class GameActivity extends AppCompatActivity {
 
             guessButton.setEnabled(false);
         }
+    }
 
+    private void saveScore() {
+        ContentValues cv = new ContentValues();
+        cv.put(MyHelper.COL_SCORE, 100 * 3 / (double) mTotalGuesses);
+        cv.put(MyHelper.COL_DIFFICULTY, mDifficulty);
+
+        mDatabase.insert(MyHelper.TABLE_NAME, null, cv);
     }
 
     private void disableAllButtons() {
@@ -309,12 +326,3 @@ public class GameActivity extends AppCompatActivity {
         return word;
     }
 }
-
-
-
-
-
-
-
-
-
