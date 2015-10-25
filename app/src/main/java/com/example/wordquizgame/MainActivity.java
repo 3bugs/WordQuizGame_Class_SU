@@ -41,5 +41,14 @@ public class MainActivity extends AppCompatActivity {
                         .show();
             }
         });
+
+        Button highScoreButton = (Button) findViewById(R.id.highScoreButton);
+        highScoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, HighScoreActivity.class);
+                startActivity(i);
+            }
+        });
     }
 }
