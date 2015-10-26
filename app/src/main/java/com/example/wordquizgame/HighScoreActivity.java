@@ -1,21 +1,22 @@
 package com.example.wordquizgame;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.SimpleCursorAdapter;
 
-import com.example.wordquizgame.db.MyHelper;
+import com.example.wordquizgame.db.ScoreDb;
 
 public class HighScoreActivity extends AppCompatActivity {
 
     private static final String TAG = "HighScoreActivity";
 
+/*
     private MyHelper mHelper;
     private SQLiteDatabase mDatabase;
+*/
     private ListView list;
     private SimpleCursorAdapter mAdapter;
 
@@ -26,15 +27,17 @@ public class HighScoreActivity extends AppCompatActivity {
 
         list = (ListView) findViewById(R.id.highScoreListView);
 
+/*
         mHelper = new MyHelper(this);
         mDatabase = mHelper.getWritableDatabase();
+*/
 
         mAdapter = new SimpleCursorAdapter(
                 this,
-                android.R.layout.simple_list_item_1,
+                R.layout.high_score_row,
                 null,
-                new String[] {MyHelper.COL_SCORE},
-                new int[] {android.R.id.text1}
+                new String[] {ScoreDb.COL_SCORE},
+                new int[] {R.id.scoreTextView}
         );
 
         list.setAdapter(mAdapter);
@@ -47,18 +50,15 @@ public class HighScoreActivity extends AppCompatActivity {
                     case R.id.easyRadioButton:
                         showHighScoreByDifficulty(0);
                         break;
-
                     case R.id.mediumRadioButton:
                         showHighScoreByDifficulty(1);
                         break;
-
                     case R.id.hardRadioButton:
                         showHighScoreByDifficulty(2);
                         break;
                 }
             }
         });
-
 
 /*
         while (c.moveToNext()) {
@@ -71,6 +71,7 @@ public class HighScoreActivity extends AppCompatActivity {
     }
 
     private void showHighScoreByDifficulty(int diff) {
+/*
         Cursor c = mDatabase.query(
                 MyHelper.TABLE_NAME,
                 null,
@@ -81,7 +82,9 @@ public class HighScoreActivity extends AppCompatActivity {
                 MyHelper.COL_SCORE + " DESC",
                 null
         );
-
+*/
+        ScoreDb db = new ScoreDb(this);
+        Cursor c = db.selectScoreByDifficulty(diff);
         mAdapter.changeCursor(c);
     }
 }

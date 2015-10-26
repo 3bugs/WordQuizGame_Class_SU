@@ -1,12 +1,10 @@
 package com.example.wordquizgame;
 
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -21,7 +19,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.example.wordquizgame.db.MyHelper;
+import com.example.wordquizgame.db.ScoreDb;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,14 +48,23 @@ public class GameActivity extends AppCompatActivity {
     private TableLayout mButtonTableLayout;
     private TextView mAnswerTextView;
 
+/*
     private MyHelper mHelper;
     private SQLiteDatabase mDatabase;
+*/
     private int mDifficulty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        if (savedInstanceState == null) {
+            Log.i(TAG, "State == null");
+        } else {
+            Log.i(TAG, "State != null");
+            mAnswerFileName = savedInstanceState.getString("answer_filename");
+        }
 
         Intent i = getIntent();
         mDifficulty = i.getIntExtra(MainActivity.KEY_DIFFICULTY, 0);
@@ -85,8 +92,10 @@ public class GameActivity extends AppCompatActivity {
         mRandom = new Random();
         mHandler = new Handler();
 
+/*
         mHelper = new MyHelper(this);
         mDatabase = mHelper.getWritableDatabase();
+*/
 
         setupViews();
         getImageFileNames();
@@ -304,11 +313,15 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void saveScore() {
+/*
         ContentValues cv = new ContentValues();
         cv.put(MyHelper.COL_SCORE, 100 * 3 / (double) mTotalGuesses);
         cv.put(MyHelper.COL_DIFFICULTY, mDifficulty);
 
         mDatabase.insert(MyHelper.TABLE_NAME, null, cv);
+*/
+        ScoreDb db = new ScoreDb(this);
+        db.insertScore(100 * 3 / (double) mTotalGuesses, mDifficulty);
     }
 
     private void disableAllButtons() {
@@ -324,5 +337,12 @@ public class GameActivity extends AppCompatActivity {
     private String getWord(String fileName) {
         String word = fileName.substring(fileName.indexOf('-') + 1);
         return word;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString("answer_filename", mAnswerFileName);
     }
 }
